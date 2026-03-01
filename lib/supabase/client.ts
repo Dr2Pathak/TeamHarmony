@@ -1,0 +1,22 @@
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+let client: ReturnType<typeof createSupabaseClient> | null = null
+
+export function createClient() {
+  if (!client) {
+    client = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+  }
+  return client
+}
+
+// Force-create a fresh client (used after logout to clear stale auth state)
+export function resetClient() {
+  client = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+  return client
+}
