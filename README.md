@@ -1,5 +1,6 @@
 # TeamHarmony
 
+Contributors: Deepak Pathak, Yash Chaudhari
 **TeamHarmony** is an AI-powered team formation and evaluation platform that assesses individual personality stability, evaluates team compatibility through a structured mixture-of-agents system, and provides optimized student group assignments using deterministic graph-based clustering. It combines multi-source personality profiling (resume, audio, survey), LLM-powered multi-agent evaluation, and algorithmic optimization to deliver structured, explainable outputs — stability scores, recommendations, strengths, weaknesses, and optimized groupings.
 
 ---
