@@ -1,39 +1,28 @@
-import { generateJSON } from '@/lib/gemini'
+// lib/agents/skill-overlap.ts (GROUNDED)
+import { runGroundedTeamAgent } from './grounded'
+import type { EnrichedMember, AgentSignal } from './signals'
 import type { TeamAgentOutput } from '@/lib/types'
 
-const SYSTEM_PROMPT = `You are a team skill overlap evaluator. Your task is to analyze a team's collective skillset and evaluate whether skills complement each other effectively.
+const SYSTEM_PROMPT = `You are a team skill overlap evaluator. You are given DETERMINISTIC pairwise skill-diversity scores (via Jaccard) and the team's combined skill coverage. These numbers are authoritative — do NOT recompute them.
 
-EVALUATION CRITERIA:
-1. Complementarity: Do team members' skills fill different niches?
-2. Coverage: Does the team collectively have the breadth of skills needed?
-3. Depth: Are there areas of deep expertise where needed?
-4. Overlap: Is overlap strategic (for collaboration) or wasteful (redundant)?
-5. Synergy: Can team members learn from each other and amplify each other's abilities?
+Your job: interpret complementarity vs redundancy, coverage breadth, and gaps from the provided signals plus each profile, then produce a score anchored to the baseline.
 
-SCORING:
-- 0.8-1.0: Excellent skill distribution, strong complementarity
-- 0.6-0.7: Good skill mix with minor redundancies or gaps
-- 0.4-0.5: Moderate issues — too much overlap or significant skill gaps
-- 0.2-0.3: Poor skill distribution, critical gaps or excessive redundancy
-- 0.0-0.1: Skills are nearly identical or completely mismatched
-
-You MUST output ONLY valid JSON with this exact structure (no text outside the JSON):
+Output ONLY valid JSON:
 {
-  "score": <float between 0 and 1>,
+  "score": <float 0-1, anchored to the deterministic baseline>,
   "recommendation": "Keep | Consider Adjustments | High Risk",
-  "strengths": ["strength1", "strength2", ...],
-  "weaknesses": ["weakness1", "weakness2", ...],
-  "explanation": "detailed explanation of skill overlap evaluation"
+  "strengths": ["...", "..."],
+  "weaknesses": ["...", "..."],
+  "explanation": "reference specific pairwise diversity scores and the coverage set"
 }
-
-Provide 2-4 strengths and 1-3 weaknesses. Reference specific skills and team members.`
+Provide 2-4 strengths and 1-3 weaknesses.`
 
 export async function runSkillOverlapAgent(
-  memberProfiles: Array<{ userId: string; name: string; role: string; canonicalProfile: string }>
+  members: EnrichedMember[],
+  signal: AgentSignal
 ): Promise<TeamAgentOutput> {
-  const input = memberProfiles
-    .map((m) => `Member: ${m.name}\nRole: ${m.role}\nProfile: ${m.canonicalProfile}`)
+  const block = members
+    .map((m) => `Member: ${m.name}\nRole: ${m.role}\nSkills: ${m.skills.join(', ') || 'none listed'}\nProfile: ${m.canonicalProfile}`)
     .join('\n\n---\n\n')
-
-  return generateJSON<TeamAgentOutput>(SYSTEM_PROMPT, `TEAM MEMBERS:\n\n${input}`)
+  return runGroundedTeamAgent(SYSTEM_PROMPT, block, signal)
 }

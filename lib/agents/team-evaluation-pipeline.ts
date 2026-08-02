@@ -1,17 +1,12 @@
+// lib/agents/team-evaluation-pipeline.ts (GROUNDED)
 import { runRoleBalanceAgent } from './role-balance'
 import { runSkillOverlapAgent } from './skill-overlap'
 import { runCommunicationRiskAgent } from './communication-risk'
 import { runDeadlineStressAgent } from './deadline-stress'
 import { runMBTICompatibilityAgent } from './mbti-compatibility'
 import { runMetaAgent } from './meta-agent'
+import { computeTeamSignals, type EnrichedMember } from './signals'
 import type { AgentScore } from '@/lib/types'
-
-interface MemberProfile {
-  userId: string
-  name: string
-  role: string
-  canonicalProfile: string
-}
 
 interface TeamEvaluationResult {
   weightedScore: number
@@ -30,66 +25,35 @@ interface TeamEvaluationResult {
 }
 
 export async function runTeamEvaluationPipeline(
-  memberProfiles: MemberProfile[]
+  members: EnrichedMember[]
 ): Promise<TeamEvaluationResult> {
-  // 1. Run all 5 agents in parallel
+  // 0. Deterministic grounding layer — pure, in-memory, ~0ms, no network/AI.
+  //    Runs ONCE, before the fan-out, so it adds no latency to the parallel calls.
+  const signals = computeTeamSignals(members)
+
+  // 1. Five grounded agents in parallel — same call count & latency profile as before.
   const [roleBalance, skillOverlap, communicationRisk, deadlineStress, mbtiCompatibility] =
     await Promise.all([
-      runRoleBalanceAgent(memberProfiles),
-      runSkillOverlapAgent(memberProfiles),
-      runCommunicationRiskAgent(memberProfiles),
-      runDeadlineStressAgent(memberProfiles),
-      runMBTICompatibilityAgent(memberProfiles),
+      runRoleBalanceAgent(members, signals.roleBalance),
+      runSkillOverlapAgent(members, signals.skillOverlap),
+      runCommunicationRiskAgent(members, signals.communicationRisk),
+      runDeadlineStressAgent(members, signals.deadlineStress),
+      runMBTICompatibilityAgent(members, signals.mbtiCompatibility),
     ])
 
-  // 2. Run meta-agent
+  // 2. Meta-agent synthesis (unchanged).
   const metaResult = await runMetaAgent(
     { roleBalance, skillOverlap, communicationRisk, deadlineStress, mbtiCompatibility },
-    memberProfiles
+    members
   )
 
-  // 3. Build agent scores for DB storage
+  // 3. Build agent scores for DB storage.
   const agentScores: AgentScore[] = [
-    {
-      agentName: 'role_balance',
-      score: roleBalance.score,
-      recommendation: roleBalance.recommendation,
-      strengths: roleBalance.strengths,
-      weaknesses: roleBalance.weaknesses,
-      explanation: roleBalance.explanation,
-    },
-    {
-      agentName: 'skill_overlap',
-      score: skillOverlap.score,
-      recommendation: skillOverlap.recommendation,
-      strengths: skillOverlap.strengths,
-      weaknesses: skillOverlap.weaknesses,
-      explanation: skillOverlap.explanation,
-    },
-    {
-      agentName: 'communication_risk',
-      score: communicationRisk.score,
-      recommendation: communicationRisk.recommendation,
-      strengths: communicationRisk.strengths,
-      weaknesses: communicationRisk.weaknesses,
-      explanation: communicationRisk.explanation,
-    },
-    {
-      agentName: 'deadline_stress',
-      score: deadlineStress.score,
-      recommendation: deadlineStress.recommendation,
-      strengths: deadlineStress.strengths,
-      weaknesses: deadlineStress.weaknesses,
-      explanation: deadlineStress.explanation,
-    },
-    {
-      agentName: 'mbti_compatibility',
-      score: mbtiCompatibility.score,
-      recommendation: mbtiCompatibility.recommendation,
-      strengths: mbtiCompatibility.strengths,
-      weaknesses: mbtiCompatibility.weaknesses,
-      explanation: mbtiCompatibility.explanation,
-    },
+    { agentName: 'role_balance', ...pick(roleBalance) },
+    { agentName: 'skill_overlap', ...pick(skillOverlap) },
+    { agentName: 'communication_risk', ...pick(communicationRisk) },
+    { agentName: 'deadline_stress', ...pick(deadlineStress) },
+    { agentName: 'mbti_compatibility', ...pick(mbtiCompatibility) },
   ]
 
   return {
@@ -100,5 +64,15 @@ export async function runTeamEvaluationPipeline(
     weaknesses: metaResult.weaknesses,
     agentScores,
     memberRecommendations: metaResult.member_recommendations,
+  }
+}
+
+function pick(o: { score: number; recommendation: string; strengths: string[]; weaknesses: string[]; explanation: string }) {
+  return {
+    score: o.score,
+    recommendation: o.recommendation,
+    strengths: o.strengths,
+    weaknesses: o.weaknesses,
+    explanation: o.explanation,
   }
 }
