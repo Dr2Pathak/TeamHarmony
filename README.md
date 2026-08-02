@@ -1,4 +1,4 @@
-# TeamHarmony
+# TeamHarmony (HackTCNJ Hackathon Winner)
  
 ![Next.js](https://img.shields.io/badge/Next.js-16.1.6-000000?logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-19.2.4-20232A?logo=react&logoColor=61DAFB)
