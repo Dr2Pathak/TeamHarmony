@@ -1,0 +1,236 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  TeamHarmony — Ensemble Mist
+  Soft cool atmosphere, deep teal harmony, warm honey accents.
+  Welcoming light theme for collaborative team formation.
+*/
+
+:root {
+  --background: #eef3f6;
+  --foreground: #15202b;
+  --card: #ffffff;
+  --card-foreground: #15202b;
+  --popover: #ffffff;
+  --popover-foreground: #15202b;
+  --primary: #1a7a6d;
+  --primary-foreground: #f4fbf9;
+  --secondary: #dce8ee;
+  --secondary-foreground: #243447;
+  --muted: #e3ebf0;
+  --muted-foreground: #5b6b7a;
+  --accent: #c9a227;
+  --accent-foreground: #1a1608;
+  --destructive: #c45c4a;
+  --destructive-foreground: #fff8f6;
+  --border: #cfdce4;
+  --input: #d9e4eb;
+  --ring: #1a7a6d;
+  --chart-1: #1a7a6d;
+  --chart-2: #2f9e8f;
+  --chart-3: #c9a227;
+  --chart-4: #4a7c9b;
+  --chart-5: #5b6b7a;
+  --success: #2f9e8f;
+  --warning: #c9a227;
+  --danger: #c45c4a;
+  --radius: 0.75rem;
+  --sidebar: #f7fafb;
+  --sidebar-foreground: #15202b;
+  --sidebar-primary: #1a7a6d;
+  --sidebar-primary-foreground: #f4fbf9;
+  --sidebar-accent: #dce8ee;
+  --sidebar-accent-foreground: #243447;
+  --sidebar-border: #cfdce4;
+  --sidebar-ring: #1a7a6d;
+  --harmony-sky: #b8d4e3;
+  --harmony-mist: #eef3f6;
+  --harmony-deep: #0f3d38;
+}
+
+.dark {
+  --background: #0f171d;
+  --foreground: #eef3f6;
+  --card: #172129;
+  --card-foreground: #eef3f6;
+  --popover: #172129;
+  --popover-foreground: #eef3f6;
+  --primary: #3db8a6;
+  --primary-foreground: #06201c;
+  --secondary: #1e2a33;
+  --secondary-foreground: #dce8ee;
+  --muted: #1e2a33;
+  --muted-foreground: #9aabba;
+  --accent: #d4b03a;
+  --accent-foreground: #1a1608;
+  --destructive: #e07a6a;
+  --destructive-foreground: #1a0c0a;
+  --border: #2a3844;
+  --input: #24313b;
+  --ring: #3db8a6;
+  --chart-1: #3db8a6;
+  --chart-2: #2f9e8f;
+  --chart-3: #d4b03a;
+  --chart-4: #6a9bb8;
+  --chart-5: #9aabba;
+  --success: #3db8a6;
+  --warning: #d4b03a;
+  --danger: #e07a6a;
+  --sidebar: #0f171d;
+  --sidebar-foreground: #eef3f6;
+  --sidebar-primary: #3db8a6;
+  --sidebar-primary-foreground: #06201c;
+  --sidebar-accent: #1e2a33;
+  --sidebar-accent-foreground: #dce8ee;
+  --sidebar-border: #2a3844;
+  --sidebar-ring: #3db8a6;
+  --harmony-sky: #1e3a48;
+  --harmony-mist: #0f171d;
+  --harmony-deep: #9ee0d4;
+}
+
+@theme inline {
+  --font-sans: var(--font-outfit), 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), 'Fraunces', ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% -10%, color-mix(in oklab, var(--harmony-sky) 55%, transparent), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 90% 0%, color-mix(in oklab, var(--primary) 12%, transparent), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display), ui-serif, Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 28%, white);
+    color: var(--foreground);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .harmony-surface {
+    background: color-mix(in oklab, var(--card) 88%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .harmony-ring {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent),
+      0 18px 40px -24px color-mix(in oklab, var(--harmony-deep) 35%, transparent);
+  }
+
+  @keyframes float-soft {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-10px) scale(1.02);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes chord-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.55;
+      transform: scale(1.04);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.7s ease-out both;
+  }
+
+  .animate-float-soft {
+    animation: float-soft 7s ease-in-out infinite;
+  }
+
+  .animate-chord {
+    animation: chord-pulse 8s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-float-soft,
+    .animate-chord {
+      animation: none;
+    }
+  }
+}
